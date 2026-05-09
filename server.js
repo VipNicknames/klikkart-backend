@@ -4,6 +4,7 @@ const products = require("./products.json");
 
 const app = express();
 
+app.use(cors());
 app.use(express.static(__dirname));
 
 app.get("/products", (req, res) => {
