@@ -8,21 +8,21 @@ app.use(cors());
 app.use(express.static(__dirname));
 
 const products = [
-  {
-    name: "Gaming Mouse",
-    price: "₹999",
-    image: "https://i.imgur.com/8Km9tLL.jpg"
-  },
-  {
-    name: "Gaming Keyboard",
-    price: "₹1999",
-    image: "https://i.imgur.com/27ZAHzq.jpg"
-  },
-  {
-    name: "Gaming Headphone",
-    price: "₹1499",
-    image: "https://i.imgur.com/2DsA49b.jpg"
-  }
+{
+  name: "Gaming Mouse",
+  price: "₹999",
+  image: "https://images.unsplash.com/photo-1527814050087-3793815479db"
+},
+{
+  name: "Gaming Keyboard",
+  price: "₹1999",
+  image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae"
+},
+{
+  name: "Gaming Headphone",
+  price: "₹1499",
+  image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e"
+}
 ];
 
 app.get("/products", (req, res) => {
