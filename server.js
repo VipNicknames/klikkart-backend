@@ -3,14 +3,19 @@ const app = express();
 
 const products = [
   {
-    id: 1,
-    name: "iPhone 15",
-    price: "₹79,999"
+    name: "Gaming Mouse",
+    price: 999,
+    image: "https://i.imgur.com/8Km9tLL.jpg"
   },
   {
-    id: 2,
-    name: "Nike Shoes",
-    price: "₹2,999"
+    name: "Gaming Keyboard",
+    price: 1999,
+    image: "https://i.imgur.com/Z7AzH2c.jpg"
+  },
+  {
+    name: "Gaming Headphone",
+    price: 1499,
+    image: "https://i.imgur.com/2DsA49b.jpg"
   }
 ];
 
@@ -22,9 +27,7 @@ app.get("/products", (req, res) => {
   res.json(products);
 });
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+app.listen(3000, () => {
+  console.log("Server running");
 });
 
