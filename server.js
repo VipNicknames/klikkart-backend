@@ -1,23 +1,10 @@
 const express = require("express");
+const cors = require("cors");
+const products = require("./products.json");
+
 const app = express();
 
-const products = [
-  {
-    name: "Gaming Mouse",
-    price: 999,
-    image: "https://i.imgur.com/8Km9tLL.jpg"
-  },
-  {
-    name: "Gaming Keyboard",
-    price: 1999,
-    image: "https://i.imgur.com/Z7AzH2c.jpg"
-  },
-  {
-    name: "Gaming Headphone",
-    price: 1499,
-    image: "https://i.imgur.com/2DsA49b.jpg"
-  }
-];
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Klikkart Backend Running 🚀");
@@ -27,7 +14,8 @@ app.get("/products", (req, res) => {
   res.json(products);
 });
 
-app.listen(3000, () => {
-  console.log("Server running");
-});
+const PORT = process.env.PORT || 3000;
 
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
