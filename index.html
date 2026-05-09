@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>KlikKart & Amazora</title>
+  
+  <style>
+    /* =========================================
+       GLOBAL & NAVBAR STYLES 
+       ========================================= */
+    :root {
+      --header-bg-klik: #2874f0;
+      --header-bg-amz: #131921;
+      --body-bg-klik: #f1f3f6;
+      --body-bg-amz: #eaeded;
+    }
+
+    body { font-family: Arial, sans-serif; margin: 0; background-color: var(--body-bg-klik); transition: background-color 0.3s ease; }
+    * { box-sizing: border-box; }
+
+    .navbar { 
+      background-color: var(--header-bg-klik); 
+      padding: 15px 10px; 
+      text-align: center; 
+      transition: top 0.3s ease, background-color 0.3s ease; 
+      position: fixed; 
+      top: 0; 
+      width: 100%; 
+      z-index: 1000;
+    }
+    .amazora-theme .navbar { background-color: var(--header-bg-amz); }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+
+    /* Logos */
+    .logo-container { position: relative; height: 50px; display: flex; align-items: center; justify-content: center; width: 100%; }
+    .klikkart-logo, .amazora-logo { display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease; width: 100%; }
+    .klikkart-logo { opacity: 1; visibility: visible; }
+    .amazora-logo { position: absolute; opacity: 0; visibility: hidden; flex-direction: column; top: 0; left: 0; height: 100%;}
+    
+    .amazora-theme .klikkart-logo { opacity: 0; visibility: hidden; }
+    .amazora-theme .amazora-logo { opacity: 1; visibility: visible; }
+
+    .logo-text { margin: 0; font-size: 26px; font-weight: bold; font-style: italic; color: white; }
+    .logo-text span { color: #ffe11b; }
+    .bag-icon { height: 45px; margin-left: 8px; margin-top: -5px;} 
+
+    .logo-text-amazora { margin: 0; font-size: 26px; font-weight: bold; letter-spacing: -0.5px; color: white;}
+    .logo-text-amazora span { color: #f3a847; }
+    .smile-icon { height: 16px; margin-top: -3px; } 
+
+    /* Search Bar & Switch */
+    .search-box { position: relative; width: 95%; max-width: 600px; display: flex; align-items: center; }
+    .search-input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 4px; border: none; outline: none; font-size: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .search-icon { position: absolute; right: 12px; color: #2874f0; width: 20px; height: 20px; cursor: pointer; }
+    .amazora-theme .search-icon { color: #131921; }
+
+    .theme-switcher { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; font-weight: bold; }
+    .label-klikkart { color: #ffe11b; }
+    .label-amazora { color: rgba(255, 255, 255, 0.5); }
+    .amazora-theme .label-klikkart { color: rgba(255, 255, 255, 0.5); }
+    .amazora-theme .label-amazora { color: #f3a847; }
+
+    .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: transparent; border: 1px solid #f3a847; }
+    input:checked + .slider:before { transform: translateX(26px); background-color: #f3a847;}
+
+    /* Added padding-top so products don't hide behind fixed navbar */
+    .main-wrapper { max-width: 800px; margin: 0 auto; background: white; min-height: 100vh; padding-top: 170px; padding-bottom: 20px;}
+
+    /* =========================================
+       KLIKKART STYLES
+       ========================================= */
+    #klikkart-dashboard { display: block; background: #e0e0e0; }
+    .kk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #e0e0e0; }
+    .kk-card { background: white; padding: 12px; position: relative; display: flex; flex-direction: column; cursor: pointer; overflow: hidden; }
+    .kk-heart { position: absolute; top: 12px; right: 12px; color: #c2c2c2; font-size: 22px; z-index: 2; }
+    .kk-img-box { display: flex; justify-content: center; align-items: center; height: 150px; margin-bottom: 15px; width: 100%; overflow: hidden; background: #f9f9f9; }
+    .kk-img-box img { width: 100%; height: 100%; object-fit: contain; }
+    .kk-sponsored { font-size: 11px; color: #878787; margin-bottom: 4px; }
+    .kk-title { font-size: 14px; color: #212121; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
+    .kk-price-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+    .kk-discount { color: #388e3c; font-size: 13px; font-weight: bold; }
+    .kk-mrp { color: #878787; font-size: 13px; text-decoration: line-through; }
+    .kk-price { color: #212121; font-size: 16px; font-weight: bold; }
+    .kk-offer { font-size: 12px; color: #1050a3; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;}
+    .kk-wow { border: 1px solid #2874f0; color: #2874f0; font-weight: bold; font-style: italic; padding: 0 4px; border-radius: 2px; font-size: 10px; letter-spacing: 0.5px;}
+    .kk-rating-row { display: flex; align-items: center; gap: 6px; margin-bottom: auto; }
+    .kk-stars { color: #388e3c; font-size: 14px; letter-spacing: -2px; margin-right: 4px;}
+    .kk-assured { width: 55px; }
+    
+    .kk-buy-btn { background: #ff9f00; color: white; border: none; padding: 8px 0; width: 100%; font-weight: bold; cursor: pointer; border-radius: 2px; font-size: 14px; margin-top: 12px; }
+
+    /* =========================================
+       AMAZORA STYLES
+       ========================================= */
+    #amazora-dashboard { display: none; background: white; }
+    .amazora-theme #klikkart-dashboard { display: none; }
+    .amazora-theme #amazora-dashboard { display: block; }
+    .amz-header-text { font-size: 13px; color: #565959; padding: 10px 14px; border-bottom: 1px solid #e7e7e7; }
+    .amz-card { display: flex; padding: 14px; border-bottom: 1px solid #e7e7e7; gap: 14px; cursor: pointer; overflow: hidden; }
+    .amz-left { width: 40%; position: relative; background: #f8f8f8; display: flex; justify-content: center; align-items: center; border-radius: 4px; padding: 10px; overflow: hidden; }
+    .amz-left img { width: 100%; height: 100%; max-height: 180px; object-fit: contain; mix-blend-mode: multiply;}
+    .amz-compare { position: absolute; bottom: 10px; left: 10px; background: white; border: 1px solid #ccc; border-radius: 20px; padding: 4px 10px; font-size: 12px; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #0f1111;}
+    .amz-right { width: 60%; display: flex; flex-direction: column; }
+    .amz-sponsored { font-size: 11px; color: #565959; margin-bottom: 2px; }
+    .amz-title { font-size: 15px; color: #0f1111; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+    .amz-rating { font-size: 13px; color: #0f1111; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .amz-stars { color: #ffa41c; font-size: 16px; letter-spacing: -2px; }
+    .amz-bought { font-size: 12px; color: #565959; margin-bottom: 6px; }
+    .amz-badge { background: #cc0c39; color: white; font-size: 12px; padding: 4px 8px; border-radius: 2px; display: inline-block; width: fit-content; font-weight: bold; margin-bottom: 6px; }
+    .amz-price-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: auto; }
+    .amz-price { font-size: 24px; color: #0f1111; font-weight: normal;}
+    .amz-mrp { font-size: 13px; color: #565959; }
+    
+    .amz-add-btn { background: #ffd814; border: 1px solid #fcd200; border-radius: 100px; padding: 10px; text-align: center; font-size: 14px; margin-top: 12px; color: #0f1111; display: block; width: 100%; font-family: inherit; cursor: pointer; font-weight: bold;}
+  </style>
+</head>
+<body>
+
+  <header class="navbar" id="main-navbar">
+    <div class="header-content">
+      <div class="logo-container">
+        <div class="klikkart-logo">
+          <h1 class="logo-text">Klik<span>Kart</span></h1>
+          <img src="klik-bag.png" alt="KlikKart" class="bag-icon" onerror="this.style.display='none'">
+        </div>
+        <div class="amazora-logo">
+          <h1 class="logo-text-amazora">Amaz<span>ora</span></h1>
+          <img src="amazon-smile.png" alt="Amazora" class="smile-icon" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" class="search-input" placeholder="Search GTA, PS5, gaming chair...">
+        <svg id="search-btn" class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <div class="theme-switcher">
+        <span class="label-klikkart">Klikkart</span>
+        <label class="switch">
+          <input type="checkbox" id="theme-toggle">
+          <span class="slider"></span>
+        </label>
+        <span class="label-amazora">Amazora</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-wrapper">
+    <div id="klikkart-dashboard">
+      <div class="kk-grid" id="kk-product-container">
+        </div>
+    </div>
+
+    <div id="amazora-dashboard">
+      <div class="amz-header-text">Check each product page for other buying options.</div>
+      <div id="amz-product-container">
+        </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       👇 SMART WORK PRODUCT LIST 👇
+       ========================================================================= */
+    const productList = [
+      // Puraane 36 Asli Products
+      "https://rukminim1.flixcart.com/image/1960/1960/xif0q/keyboard/gaming-keyboard/h/y/z/x2-mechanical-evofox-original-imahexbusm7hyxqy.jpeg?q=90 | EVOFOX X2 Mechanical Wired USB Standard Gaming Keyboard Compatible with Desktop, Laptop, Mac (White) | 49% | 3,499 | 1,799 | https://fktr.in/OL55vAY | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/mouse/j/k/8/-original-imah4ya5dhrq7nkx.jpeg?q=90 | Portronics Toad One Ambidextrous Optical Mouse Rechargeable with 6 Buttons, RGB Lights (Black) | 60% | 1,499 | 603 | https://dl.flipkart.com/dl/portronics-toad-one-ambidextrous-optical-mouse-rechargeable-6-buttons-rgb-lights/p/itmd0563fac24fbe | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/monitor/m/g/t/zeb-ea124-full-hd-24-2024-zeb-ea124-100hz-online-zebronics-original-imahh3jzy2h7jndv.jpeg?q=90 | ZEBRONICS Pure Pixel 60.96 cm (24 inch) Full HD VA Panel Monitor | 76% | 24,999 | 5,999 | https://fktr.in/Aa05sSC | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/keyboard/gaming-keyboard/6/o/l/katana-x2-mechanical-dynamic-backlighting-evofox-original-imahjsw9avppbg6g.jpeg?q=90 | EVOFOX Katana X2 Mechanical Dynamic Backlighting Wired USB Standard Gaming Keyboard (Black) | 49% | 3,499 | 1,799 | https://fktr.in/19yRK3f | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/headphone/k/u/x/music-studio-gaming-online-classes-with-other-voice-cancellation-original-imaha6yzbxqh3xzg.jpeg?q=90 | PunnkFunnk Music Studio Gaming Wired Headset (Black, On the Ear) | 84% | 4,999 | 813 | https://fktr.in/uS6Pksz | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/headphone/s/b/c/-original-imahhfepsgsh5myf.jpeg?q=90 | TRIGGR Wukong 35dB ANC, 4-mic ENC, Dual Pairing, v6.0 Bluetooth Headset | 78% | 4,999 | 1,099 | https://fktr.in/cGqasSE | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/microphone/b/c/c/studio-mic-setup-with-noise-reduction-volume-control-rgb-original-imahephkzmxzyzph.jpeg?q=90 | WRADER Wired USB Studio Recording Mic Full Setup for Podcast Recording Youtube Singing Microphone | 73% | 4,996 | 1,349 | https://fktr.in/0b9PzMa | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/mouse/a/x/y/spectre-3600-dpi-gaming-sensor-and-7-colours-rainbow-lighting-original-imahm7h6wc7cgbpt.jpeg?q=90 | EVOFOX Spectre Wired Ambidextrous Optical Gaming Mouse 3600 DPI Gaming Sensor | 68% | 799 | 259 | https://fktr.in/BF990b4 | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/headphone/0/p/4/zeb-jet-pro-zebronics-original-imah9zec4ngbbffg.jpeg?q=90 | ZEBRONICS Zeb-Jet Pro Premium Headphone, LED Headband, Wired Gaming Headset | 53% | 1,899 | 888 | https://fktr.in/xKfznOi | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/gamepad/wireless-wired-bluetooth/d/k/m/one-s-universal-3-mode-wireless-wired-evofox-original-imahmd5gcrcvc5eh.jpeg?q=90 | EVOFOX One S Universal 3-Mode Wireless & Wired Gamepad | 31% | 2,299 | 1,589 | https://fktr.in/kkyjpCW | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/k3orqfk0/gamingconsole/z/2/p/32-switch-with-neon-red-and-neon-blue-joy-con-version-2-nintendo-original-imafmqwkepuyvpzy.jpeg?q=90 | NINTENDO Switch with neon red and neon blue Joy-Con - 32 GB | 3% | 39,990 | 38,990 | https://fktr.in/7sLGN5E | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/gamepad/x/w/j/-original-imahg4s8rhnktjkf.jpeg?q=90 | Sony PS5 DualSense Wireless Controller (White, For PS5) | 6% | 6,390 | 5,999 | https://fktr.in/xSAnEyT | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/gamingconsole/e/u/m/-original-imahhgzqxaf5hc3q.jpeg?q=90 | SONY PlayStation 5 Console (slim) 1024 GB (White) PS5 | 0% | 54,990 | 54,990 | https://fktr.in/MCJpp7i | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/gamingconsole/h/w/p/1024-series-x-1tb-disc-edition-4k-resolution-with-120fps-high-original-imahm8tg9yhhfmkz.jpeg?q=90 | Xbox Series X 1TB Disc Edition, 4K Resolution with 120FPS | 9% | 84,990 | 77,677 | https://fktr.in/JPmhxMy | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/joystick/analog-joysticks/z/l/m/x3-bluetooth-wireless-gamepad-controlle-for-andriod-phone-pc-and-original-imah62jbyg2h3fr4.jpeg?q=90 | Decasa X3 Bluetooth Wireless Gamepad Controller | 63% | 1,899 | 699 | https://fktr.in/s76OI0x | klikkart",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/monitor/g/9/9/-original-imahbk3vrnvhvhrn.jpeg?q=90 | Acer Nitro 60.45 cm (24 inch) Full HD LED Backlit IPS Panel Gaming Monitor | 36% | 12,999 | 8,299 | https://fktr.in/qQ8eAB7 | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/kwxv98w0/mousepad/2/m/r/criss-corss-pattern-combo-3-mouse-pad-non-slip-rubber-base-mouse-original-imag9g54hejz5pk9.jpeg?q=90 | qivee CRISS CORSS PATTERN COMBO Mouse Pad Non-Slip | 61% | 249 | 96 | https://fktr.in/IJvyavp | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/mousepad/o/z/q/gaming-and-spiderman-nonslip-rubber-base-spiderman-smuly-original-imahmw5gnvfdsady.jpeg?q=90 | SMULY Gaming and Spiderman, NonSlip Rubber Base Mousepad | 82% | 1,299 | 230 | https://fktr.in/h1aFgWl | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/kkfrjww0/gamepad/wireless/d/e/r/1v8-00006-microsoft-original-imafzsc7tygvdnmy.jpeg?q=90 | MICROSOFT Wireless Controller Bluetooth Gamepad Xbox | 7% | 6,457 | 5,990 | https://fktr.in/02ieA4z | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/kt39jm80/finger-sleeve/t/y/v/thumb-sleeve-with-earphone-pouch-for-pubg-call-of-duty-free-fire-original-imag6gts55crgzcg.jpeg?q=90 | PORTLIX Thumb gloves With Earphone Pouch for Mobile gaming | 85% | 699 | 106 | https://fktr.in/xN1cexc | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/mouse/j/8/4/blaze-12800-dpi-gaming-sensor-and-8-buttons-rgb-evofox-original-imah4zf6axmkaqsc.jpeg?q=90 | EVOFOX Blaze Wired Ambidextrous Optical Gaming Mouse 12800 DPI | 52% | 1,299 | 629 | https://fktr.in/6xnEnsC | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/headphone/g/y/j/new-launch-havoc-premium-with-dolby-atmos-subscription-zebronics-original-imah6fz339uftvur.jpeg?q=90 | ZEBRONICS Zeb-Havoc Premium Headphone, Dolby Atmos Subscription | 40% | 2,999 | 1,799 | https://fktr.in/7EaFioe | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/b/3/t/no-standard-edition-ps5-grand-theft-auto-v-full-game-ps5-original-imahh4dwf7h8hdua.jpeg?q=90 | PS5 Grand Theft Auto V (for PS5, VR Compatible) | 20% | 3,399 | 2,713 | https://fktr.in/cx9Jhy8 | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/h/d/g/-original-imahhega3yztkzvj.jpeg?q=90 | PS5 WWE 2K26 (Standard) (Multiplayer, for PS5) | 40% | 4,999 | 2,999 | https://fktr.in/MXoxAgk | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/r/g/4/no-standard-edition-wwe-2k26-nintendo-switch-2-game-ultimate-original-imahhjfdrp4mvqdb.jpeg?q=90 | WWE 2K26 Nintendo Switch 2 Game Premium Physical Switch Game | 0% | 4,999 | 4,999 | https://fktr.in/eb6mhdU | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/u/g/f/no-standard-wwe-2k25-single-player-multi-player-ps5-original-imahh4dwjxzhz3qs.jpeg?q=90 | WWE 2K25 (Standard) (Single-player, Multi-player, for PS5) | 42% | 4,999 | 2,918 | https://fktr.in/rd7oLNR | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/y/l/2/yes-standard-edition-wwe-2k25-nintendo-switch-2-game-wwe-2k25-original-imahh4dxemdfzfnk.jpeg?q=90 | WWE 2K25 Nintendo Switch 2 Game Physical Switch 2 Games | 6% | 5,299 | 4,978 | https://fktr.in/s9sYI0O | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/av-media/games/u/e/z/grand-theft-auto-v-original-imadxdjnmyf5yhyd.jpeg?q=90 | Grand Theft Auto V (for Xbox One) | 2% | 3,199 | 3,134 | https://fktr.in/8rX0PaZ | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/shopsy-code-in-the-box-game/t/q/l/pc-grand-theft-auto-v-pc-rockstar-download-code-no-cd-dvd-original-imahfhj2v7ndyshg.jpeg?q=90 | Grand Theft Auto V Premium + Bull Shark Cash Card Special Edition (Code in the Box - for PC) | 85% | 2,999 | 448 | https://fktr.in/nVkI4hq | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/cooling-pad/w/y/q/laptop-cooling-pad-2x125mm-led-fans-built-in-mobile-stand-original-imahhm9xqkxesvh4.jpeg?q=90 | Frontech Laptop Cooling Pad 2x125mm LED Fans Built-in Mobile Stand | 50% | 1,300 | 654 | https://fktr.in/CpUd4c3 | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/bar-stool-chair/f/d/8/1-grey-foam-44-8-spin-grey-maestro-seating-systems-grey-20-original-imahcuxyczgzbyz5.jpeg?q=90 | MAESTRO SEATING SYSTEMS SPIN GREY Gaming Chair (Grey) | 61% | 15,999 | 6,296 | https://fktr.in/ooK4XgO | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/keyboard/gaming-keyboard/6/b/d/kb-0042-wired-keyboard-rgb-backlight-104-keys-frontech-original-imahhzpzhm3e6kxx.jpeg?q=90 | Frontech KB-0042 Wired Keyboard RGB Backlight 104 Keys Gaming Keyboard | 79% | 1,900 | 405 | https://fktr.in/P7luG3c | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/selector-box/1/g/i/4k-hdmi-video-capture-card-game-capture-card-cam-link-card-video-original-imahdhadv4geb9hk.jpeg?q=90 | BKC 4K HDMI Video Capture Card Game Capture Card Cam Link Card | 56% | 999 | 441 | https://fktr.in/If7vWA2 | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/cooling-pad/u/y/u/x-memo-dla2-semiconductor-radiator-cooler-with-adjustable-phone-original-imah2hj66rfqfezw.jpeg?q=90 | Cubonic X Memo DLA2 Semiconductor Radiator Cooling Fan with Adjustable Phone Mount | 70% | 2,499 | 746 | https://fktr.in/wjefuY7 | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/motion-controller/t/e/3/v3-180-degree-racing-game-steering-wheel-with-brake-pedal-pxn-original-imah53f2jazfeguc.jpeg?q=90 | PXN V3 180 Degree Racing Game Steering Wheel With Brake Pedal Motion Controller | 39% | 9,999 | 6,095 | https://fktr.in/q9eS1mi | klikkart",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/webcam/6/y/k/net-bo-300-fhd-lenovo-original-imaghg69xuwxkyzx.jpeg?q=90 | Lenovo 300 FHD 2.1 MP HD Webcam with Built-In Microphone USB Connectivity | 23% | 4,099 | 3,174 | https://fktr.in/B4162aE | klikkart",
+
+      // 🔴 KHALI DABBE (10 API PLACEHOLDERS) 🔴
+      "API_IMAGE_URL_1 | API_PRODUCT_TITLE_1 | API_DISC_1 | API_MRP_1 | API_PRICE_1 | API_LINK_1 | klikkart",
+      "API_IMAGE_URL_2 | API_PRODUCT_TITLE_2 | API_DISC_2 | API_MRP_2 | API_PRICE_2 | API_LINK_2 | klikkart",
+      "API_IMAGE_URL_3 | API_PRODUCT_TITLE_3 | API_DISC_3 | API_MRP_3 | API_PRICE_3 | API_LINK_3 | klikkart",
+      "API_IMAGE_URL_4 | API_PRODUCT_TITLE_4 | API_DISC_4 | API_MRP_4 | API_PRICE_4 | API_LINK_4 | klikkart",
+      "API_IMAGE_URL_5 | API_PRODUCT_TITLE_5 | API_DISC_5 | API_MRP_5 | API_PRICE_5 | API_LINK_5 | klikkart",
+      "API_IMAGE_URL_6 | API_PRODUCT_TITLE_6 | API_DISC_6 | API_MRP_6 | API_PRICE_6 | API_LINK_6 | klikkart",
+      "API_IMAGE_URL_7 | API_PRODUCT_TITLE_7 | API_DISC_7 | API_MRP_7 | API_PRICE_7 | API_LINK_7 | klikkart",
+      "API_IMAGE_URL_8 | API_PRODUCT_TITLE_8 | API_DISC_8 | API_MRP_8 | API_PRICE_8 | API_LINK_8 | klikkart",
+      "API_IMAGE_URL_9 | API_PRODUCT_TITLE_9 | API_DISC_9 | API_MRP_9 | API_PRICE_9 | API_LINK_9 | klikkart",
+      "API_IMAGE_URL_10 | API_PRODUCT_TITLE_10 | API_DISC_10 | API_MRP_10 | API_PRICE_10 | API_LINK_10 | klikkart"
+    ];
+
+    const kkContainer = document.getElementById('kk-product-container');
+    const amzContainer = document.getElementById('amz-product-container');
+
+    productList.forEach(item => {
+      let parts = item.split('|').map(s => s.trim());
+      let img = parts[0], title = parts[1], discount = parts[2], mrp = parts[3], price = parts[4], link = parts[5];
+      let platform = parts.length > 6 ? parts[6] : 'both';
+
+      // 1. Klikkart Card
+      let kkCard = `
+        <div class="kk-card search-item" onclick="window.open('${link}', '_blank')">
+          <div class="kk-heart">♡</div>
+          <div class="kk-img-box"><img src="${img}" alt="Product"></div>
+          <div class="kk-sponsored">Sponsored</div>
+          <div class="kk-title item-title">${title}</div>
+          <div class="kk-price-row">
+            <span class="kk-discount">↓${discount}</span>
+            <span class="kk-mrp">₹${mrp}</span>
+            <span class="kk-price">₹${price}</span>
+          </div>
+          <div class="kk-offer"><span class="kk-wow">WOW!</span> Top Deal</div>
+          <div class="kk-rating-row">
+            <span class="kk-stars">★★★★★</span>
+            <img class="kk-assured" src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/fa_62673a.png" alt="Assured">
+          </div>
+          <button class="kk-buy-btn" onclick="event.stopPropagation(); window.open('${link}', '_blank')">BUY NOW</button>
+        </div>
+      `;
+      kkContainer.innerHTML += kkCard;
+
+      // 2. Amazora Card
+      if (platform === 'both' || platform === 'amazora') {
+        let amzCard = `
+          <div class="amz-card search-item" onclick="window.open('${link}', '_blank')">
+            <div class="amz-left">
+              <img src="${img}" alt="Product">
+              <div class="amz-compare" onclick="event.stopPropagation();"><input type="checkbox"> Compare</div>
+            </div>
+            <div class="amz-right">
+              <div class="amz-sponsored">Sponsored</div>
+              <div class="amz-title item-title">${title}</div>
+              <div class="amz-rating">4.5 <span class="amz-stars">★★★★☆</span> (2K+)</div>
+              <div class="amz-bought">1K+ bought in past month</div>
+              <div class="amz-badge">Great Summer Deal</div>
+              <div class="amz-price-row">
+                <span class="amz-price">₹${price}</span>
+                <span class="amz-mrp">M.R.P: <strike>₹${mrp}</strike> (${discount} off)</span>
+              </div>
+              <button class="amz-add-btn" onclick="event.stopPropagation(); window.open('${link}', '_blank')">Buy Now</button>
+            </div>
+          </div>
+        `;
+        amzContainer.innerHTML += amzCard;
+      }
+    });
+
+    /* =========================================================================
+       🤖 AI SEARCH DETECTOR LOGIC 
+       ========================================================================= */
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    const searchInput = document.getElementById('search-input');
+
+    themeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        body.classList.add('amazora-theme');
+        body.style.backgroundColor = 'var(--body-bg-amz)';
+      } else {
+        body.classList.remove('amazora-theme');
+        body.style.backgroundColor = 'var(--body-bg-klik)';
+      }
+      performSearch();
+    });
+
+    function performSearch() {
+      let query = searchInput.value.toLowerCase().trim();
+      let isAmazora = body.classList.contains('amazora-theme');
+      let activeContainer = isAmazora ? document.getElementById('amazora-dashboard') : document.getElementById('klikkart-dashboard');
+      let items = activeContainer.querySelectorAll('.search-item');
+      
+      items.forEach(item => {
+        let titleText = item.querySelector('.item-title').innerText.toLowerCase();
+        
+        let isMatch = titleText.includes(query);
+        
+        if (query === 'ps5' && titleText.includes('playstation 5')) {
+            isMatch = true;
+        }
+        if (query === 'gta' && titleText.includes('grand theft auto')) {
+            isMatch = true;
+        }
+
+        item.style.display = isMatch ? "flex" : "none";
+      });
+    }
+    
+    searchInput.addEventListener('keyup', performSearch);
+    document.getElementById('search-btn').addEventListener('click', performSearch);
+
+    /* =========================================================================
+       🔥 SMART WORK: NAVBAR SCROLL HIDE/SHOW LOGIC 🔥
+       ========================================================================= */
+    let lastScrollTop = 0;
+    const navbar = document.getElementById('main-navbar');
+
+    window.addEventListener('scroll', function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (scrollTop > lastScrollTop) {
+        navbar.style.top = "-180px"; 
+      } 
+      else {
+        navbar.style.top = "0"; 
+      }
+      
+      lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+    });
+  </script>
+</body>
+</html>
