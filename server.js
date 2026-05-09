@@ -6,10 +6,6 @@ const app = express();
 
 app.use(express.static(__dirname));
 
-app.get("/", (req, res) => {
-  res.send("Klikkart Backend Running 🚀");
-});
-
 app.get("/products", (req, res) => {
   res.json(products);
 });
