@@ -1,29 +1,30 @@
 const express = require("express");
-const cors = require("cors");
-
 const app = express();
 
-app.use(cors());
+const products = [
+  {
+    id: 1,
+    name: "iPhone 15",
+    price: "₹79,999"
+  },
+  {
+    id: 2,
+    name: "Nike Shoes",
+    price: "₹2,999"
+  }
+];
+
+app.get("/", (req, res) => {
+  res.send("Klikkart Backend Running 🚀");
+});
 
 app.get("/products", (req, res) => {
-  res.json([
-    {
-      title: "Gaming Keyboard",
-      price: "₹1999"
-    },
-    {
-      title: "Gaming Mouse",
-      price: "₹799"
-    },
-    {
-      title: "PS5 Controller",
-      price: "₹5999"
-    }
-  ]);
+  res.json(products);
 });
 
-app.listen(3000, () => {
-  console.log("Klikkart Server Running 🔥");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
-0
 
