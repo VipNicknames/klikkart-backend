@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>KlikKart & Amazora</title>
+  
+  <style>
+    :root {
+      --header-bg-klik: #2874f0;
+      --header-bg-amz: #131921;
+      --body-bg-klik: #f1f3f6;
+      --body-bg-amz: #eaeded;
+    }
+
+    body { font-family: Arial, sans-serif; margin: 0; background-color: var(--body-bg-klik); transition: background-color 0.3s ease; }
+    * { box-sizing: border-box; }
+
+    .navbar { 
+      background-color: var(--header-bg-klik); 
+      padding: 15px 10px; 
+      text-align: center; 
+      transition: top 0.3s ease, background-color 0.3s ease; 
+      position: fixed; 
+      top: 0; 
+      width: 100%; 
+      z-index: 1000;
+    }
+    .amazora-theme .navbar { background-color: var(--header-bg-amz); }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+
+    .logo-container { position: relative; height: 50px; display: flex; align-items: center; justify-content: center; width: 100%; }
+    .klikkart-logo, .amazora-logo { display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease; width: 100%; }
+    .klikkart-logo { opacity: 1; visibility: visible; }
+    .amazora-logo { position: absolute; opacity: 0; visibility: hidden; flex-direction: column; top: 0; left: 0; height: 100%;}
+    
+    .amazora-theme .klikkart-logo { opacity: 0; visibility: hidden; }
+    .amazora-theme .amazora-logo { opacity: 1; visibility: visible; }
+
+    .logo-text { margin: 0; font-size: 26px; font-weight: bold; font-style: italic; color: white; }
+    .logo-text span { color: #ffe11b; }
+    .bag-icon { height: 45px; margin-left: 8px; margin-top: -5px;} 
+
+    .logo-text-amazora { margin: 0; font-size: 26px; font-weight: bold; letter-spacing: -0.5px; color: white;}
+    .logo-text-amazora span { color: #f3a847; }
+    .smile-icon { height: 16px; margin-top: -3px; } 
+
+    .search-box { position: relative; width: 95%; max-width: 600px; display: flex; align-items: center; }
+    .search-input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 4px; border: none; outline: none; font-size: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .search-icon { position: absolute; right: 12px; color: #2874f0; width: 20px; height: 20px; cursor: pointer; }
+    .amazora-theme .search-icon { color: #131921; }
+
+    .theme-switcher { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; font-weight: bold; }
+    .label-klikkart { color: #ffe11b; }
+    .label-amazora { color: rgba(255, 255, 255, 0.5); }
+    .amazora-theme .label-klikkart { color: rgba(255, 255, 255, 0.5); }
+    .amazora-theme .label-amazora { color: #f3a847; }
+
+    .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: transparent; border: 1px solid #f3a847; }
+    input:checked + .slider:before { transform: translateX(26px); background-color: #f3a847;}
+
+    .main-wrapper { max-width: 800px; margin: 0 auto; background: white; min-height: 100vh; padding-top: 170px; padding-bottom: 20px;}
+
+    #klikkart-dashboard { display: block; background: #e0e0e0; }
+    .kk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #e0e0e0; }
+    .kk-card { background: white; padding: 12px; position: relative; display: flex; flex-direction: column; cursor: pointer; overflow: hidden; }
+    .kk-heart { position: absolute; top: 12px; right: 12px; color: #c2c2c2; font-size: 22px; z-index: 2; }
+    .kk-img-box { display: flex; justify-content: center; align-items: center; height: 150px; margin-bottom: 15px; width: 100%; overflow: hidden; }
+    .kk-img-box img { width: 100%; height: 100%; object-fit: contain; }
+    .kk-sponsored { font-size: 11px; color: #878787; margin-bottom: 4px; }
+    .kk-title { font-size: 14px; color: #212121; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
+    .kk-price-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+    .kk-discount { color: #388e3c; font-size: 13px; font-weight: bold; }
+    .kk-mrp { color: #878787; font-size: 13px; text-decoration: line-through; }
+    .kk-price { color: #212121; font-size: 16px; font-weight: bold; }
+    .kk-offer { font-size: 12px; color: #1050a3; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;}
+    .kk-wow { border: 1px solid #2874f0; color: #2874f0; font-weight: bold; font-style: italic; padding: 0 4px; border-radius: 2px; font-size: 10px; letter-spacing: 0.5px;}
+    .kk-rating-row { display: flex; align-items: center; gap: 6px; margin-bottom: auto; }
+    .kk-stars { color: #388e3c; font-size: 14px; letter-spacing: -2px; margin-right: 4px;}
+    .kk-assured { width: 55px; }
+    
+    .kk-buy-btn { background: #ff9f00; color: white; border: none; padding: 8px 0; width: 100%; font-weight: bold; cursor: pointer; border-radius: 2px; font-size: 14px; margin-top: 12px; }
+
+    #amazora-dashboard { display: none; background: white; }
+    .amazora-theme #klikkart-dashboard { display: none; }
+    .amazora-theme #amazora-dashboard { display: block; }
+    .amz-header-text { font-size: 13px; color: #565959; padding: 10px 14px; border-bottom: 1px solid #e7e7e7; }
+  </style>
+</head>
+<body>
+
+  <header class="navbar" id="main-navbar">
+    <div class="header-content">
+      <div class="logo-container">
+        <div class="klikkart-logo">
+          <h1 class="logo-text">Klik<span>Kart</span></h1>
+          <img src="klik-bag.png" alt="KlikKart" class="bag-icon" onerror="this.style.display='none'">
+        </div>
+        <div class="amazora-logo">
+          <h1 class="logo-text-amazora">Amaz<span>ora</span></h1>
+          <img src="amazon-smile.png" alt="Amazora" class="smile-icon" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" class="search-input" placeholder="Search products...">
+        <svg id="search-btn" class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <div class="theme-switcher">
+        <span class="label-klikkart">Klikkart</span>
+        <label class="switch">
+          <input type="checkbox" id="theme-toggle">
+          <span class="slider"></span>
+        </label>
+        <span class="label-amazora">Amazora</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-wrapper">
+    <div id="klikkart-dashboard">
+      <div class="kk-grid" id="kk-product-container"></div>
+    </div>
+    <div id="amazora-dashboard">
+      <div class="amz-header-text">Check each product page for other buying options.</div>
+      <div id="amz-product-container"></div>
+    </div>
+  </div>
+
+  <script>
+    const productList = [
+      "https://rukminim1.flixcart.com/image/1960/1960/xif0q/keyboard/gaming-keyboard/h/y/z/x2-mechanical-evofox-original-imahexbusm7hyxqy.jpeg?q=90 | EVOFOX X2 Gaming Keyboard | 49% OFF | MRP 3499 | Price 1799 | https://fktr.in/OL55vAY",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/mouse/j/k/8/-original-imah4ya5dhrq7nkx.jpeg?q=90 | Portronics Toad One Mouse | 60% OFF | MRP 1499 | Price 603 | https://dl.flipkart.com/dl/portronics-toad-one-ambidextrous-optical-mouse-rechargeable-6-buttons-rgb-lights/p/itmd0563fac24fbe",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/monitor/m/g/t/zeb-ea124-full-hd-24-2024-zeb-ea124-100hz-online-zebronics-original-imahh3jzy2h7jndv.jpeg?q=90 | ZEBRONICS 24 inch Monitor | 76% OFF | MRP 24999 | Price 5999 | https://fktr.in/Aa05sSC",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/keyboard/gaming-keyboard/6/o/l/katana-x2-mechanical-dynamic-backlighting-evofox-original-imahjsw9avppbg6g.jpeg?q=90 | EVOFOX Katana X2 Gaming Keyboard | 49% OFF | MRP 3499 | Price 1799 | https://fktr.in/19yRK3f",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/headphone/k/u/x/music-studio-gaming-online-classes-with-other-voice-cancellation-original-imaha6yzbxqh3xzg.jpeg?q=90 | PunnkFunnk Music Studio Gaming Headset | 84% OFF | MRP 4999 | Price 813 | https://fktr.in/uS6Pksz",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/headphone/s/b/c/-original-imahhfepsgsh5myf.jpeg?q=90 | TRIGGR Wukong ANC Headset | 78% OFF | MRP 4999 | Price 1099 | https://fktr.in/cGqasSE",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/microphone/b/c/c/studio-mic-setup-with-noise-reduction-volume-control-rgb-original-imahephkzmxzyzph.jpeg?q=90 | WRADER Studio Recording Mic | 73% OFF | MRP 4996 | Price 1349 | https://fktr.in/0b9PzMa",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/mouse/a/x/y/spectre-3600-dpi-gaming-sensor-and-7-colours-rainbow-lighting-original-imahm7h6wc7cgbpt.jpeg?q=90 | EVOFOX Spectre Gaming Mouse | 68% OFF | MRP 799 | Price 259 | https://fktr.in/BF990b4",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/headphone/0/p/4/zeb-jet-pro-zebronics-original-imah9zec4ngbbffg.jpeg?q=90 | ZEBRONICS Zeb-Jet Pro Headphone | 53% OFF | MRP 1899 | Price 888 | https://fktr.in/xKfznOi",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/gamepad/wireless-wired-bluetooth/d/k/m/one-s-universal-3-mode-wireless-wired-evofox-original-imahmd5gcrcvc5eh.jpeg?q=90 | EVOFOX One S Gamepad | 31% OFF | MRP 2299 | Price 1589 | https://fktr.in/kkyjpCW",
+      "https://rukminim2.flixcart.com/image/640/640/k3orqfk0/gamingconsole/z/2/p/32-switch-with-neon-red-and-neon-blue-joy-con-version-2-nintendo-original-imafmqwkepuyvpzy.jpeg?q=90 | NINTENDO Switch Console | 3% OFF | MRP 39990 | Price 38990 | https://fktr.in/7sLGN5E",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/gamepad/x/w/j/-original-imahg4s8rhnktjkf.jpeg?q=90 | Sony PS5 DualSense Controller | 6% OFF | MRP 6390 | Price 5999 | https://fktr.in/xSAnEyT",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/gamingconsole/e/u/m/-original-imahhgzqxaf5hc3q.jpeg?q=90 | SONY PlayStation 5 Console | 0% OFF | MRP 54990 | Price 54990 | https://fktr.in/MCJpp7i",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/gamingconsole/h/w/p/1024-series-x-1tb-disc-edition-4k-resolution-with-120fps-high-original-imahm8tg9yhhfmkz.jpeg?q=90 | Xbox Series X 1TB Console | 9% OFF | MRP 84990 | Price 77677 | https://fktr.in/JPmhxMy",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/joystick/analog-joysticks/z/l/m/x3-bluetooth-wireless-gamepad-controlle-for-andriod-phone-pc-and-original-imah62jbyg2h3fr4.jpeg?q=90 | Decasa X3 Wireless Gamepad | 63% OFF | MRP 1899 | Price 699 | https://fktr.in/s76OI0x",
+      "https://rukminim2.flixcart.com/image/640/640/xif0q/monitor/g/9/9/-original-imahbk3vrnvhvhrn.jpeg?q=90 | Acer Nitro 24 inch Monitor | 36% OFF | MRP 12999 | Price 8299 | https://fktr.in/qQ8eAB7",
+      "https://rukminim1.flixcart.com/image/640/640/kwxv98w0/mousepad/2/m/r/criss-corss-pattern-combo-3-mouse-pad-non-slip-rubber-base-mouse-original-imag9g54hejz5pk9.jpeg?q=90 | qivee Mouse Pad Non-Slip | 61% OFF | MRP 249 | Price 96 | https://fktr.in/IJvyavp",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/mousepad/o/z/q/gaming-and-spiderman-nonslip-rubber-base-spiderman-smuly-original-imahmw5gnvfdsady.jpeg?q=90 | SMULY Gaming Mousepad | 82% OFF | MRP 1299 | Price 230 | https://fktr.in/h1aFgWl",
+      "https://rukminim1.flixcart.com/image/640/640/kkfrjww0/gamepad/wireless/d/e/r/1v8-00006-microsoft-original-imafzsc7tygvdnmy.jpeg?q=90 | MICROSOFT Xbox Controller | 7% OFF | MRP 6457 | Price 5990 | https://fktr.in/02ieA4z",
+      "https://rukminim1.flixcart.com/image/640/640/kt39jm80/finger-sleeve/t/y/v/thumb-sleeve-with-earphone-pouch-for-pubg-call-of-duty-free-fire-original-imag6gts55crgzcg.jpeg?q=90 | PORTLIX Thumb gloves | 85% OFF | MRP 699 | Price 106 | https://fktr.in/xN1cexc",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/mouse/j/8/4/blaze-12800-dpi-gaming-sensor-and-8-buttons-rgb-evofox-original-imah4zf6axmkaqsc.jpeg?q=90 | EVOFOX Blaze Gaming Mouse | 52% OFF | MRP 1299 | Price 629 | https://fktr.in/6xnEnsC",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/headphone/g/y/j/new-launch-havoc-premium-with-dolby-atmos-subscription-zebronics-original-imah6fz339uftvur.jpeg?q=90 | ZEBRONICS Zeb-Havoc Headphone | 40% OFF | MRP 2999 | Price 1799 | https://fktr.in/7EaFioe",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/b/3/t/no-standard-edition-ps5-grand-theft-auto-v-full-game-ps5-original-imahh4dwf7h8hdua.jpeg?q=90 | PS5 Grand Theft Auto V Game | 20% OFF | MRP 3399 | Price 2713 | https://fktr.in/cx9Jhy8",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/h/d/g/-original-imahhega3yztkzvj.jpeg?q=90 | PS5 WWE 2K26 Game | 40% OFF | MRP 4999 | Price 2999 | https://fktr.in/MXoxAgk",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/r/g/4/no-standard-edition-wwe-2k26-nintendo-switch-2-game-ultimate-original-imahhjfdrp4mvqdb.jpeg?q=90 | WWE 2K26 Switch 2 Game | 0% OFF | MRP 4999 | Price 4999 | https://fktr.in/eb6mhdU",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/u/g/f/no-standard-wwe-2k25-single-player-multi-player-ps5-original-imahh4dwjxzhz3qs.jpeg?q=90 | WWE 2K25 PS5 Game | 42% OFF | MRP 4999 | Price 2918 | https://fktr.in/rd7oLNR",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/physical-game/y/l/2/yes-standard-edition-wwe-2k25-nintendo-switch-2-game-wwe-2k25-original-imahh4dxemdfzfnk.jpeg?q=90 | WWE 2K25 Switch 2 Game | 6% OFF | MRP 5299 | Price 4978 | https://fktr.in/s9sYI0O",
+      "https://rukminim1.flixcart.com/image/640/640/av-media/games/u/e/z/grand-theft-auto-v-original-imadxdjnmyf5yhyd.jpeg?q=90 | GTA V Xbox One Game | 2% OFF | MRP 3199 | Price 3134 | https://fktr.in/8rX0PaZ",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/shopsy-code-in-the-box-game/t/q/l/pc-grand-theft-auto-v-pc-rockstar-download-code-no-cd-dvd-original-imahfhj2v7ndyshg.jpeg?q=90 | GTA V PC Edition | 85% OFF | MRP 2999 | Price 448 | https://fktr.in/nVkI4hq",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/cooling-pad/w/y/q/laptop-cooling-pad-2x125mm-led-fans-built-in-mobile-stand-original-imahhm9xqkxesvh4.jpeg?q=90 | Frontech Laptop Cooling Pad | 50% OFF | MRP 1300 | Price 654 | https://fktr.in/CpUd4c3",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/bar-stool-chair/f/d/8/1-grey-foam-44-8-spin-grey-maestro-seating-systems-grey-20-original-imahcuxyczgzbyz5.jpeg?q=90 | MAESTRO Gaming Chair | 61% OFF | MRP 15999 | Price 6296 | https://fktr.in/ooK4XgO",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/keyboard/6/b/d/kb-0042-wired-keyboard-rgb-backlight-104-keys-frontech-original-imahhzpzhm3e6kxx.jpeg?q=90 | Frontech Wired Keyboard | 79% OFF | MRP 1900 | Price 405 | https://fktr.in/P7luG3c",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/selector-box/1/g/i/4k-hdmi-video-capture-card-game-capture-card-cam-link-card-video-original-imahdhadv4geb9hk.jpeg?q=90 | BKC 4K HDMI Capture Card | 56% OFF | MRP 999 | Price 441 | https://fktr.in/If7vWA2",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/cooling-pad/u/y/u/x-memo-dla2-semiconductor-radiator-cooler-with-adjustable-phone-original-imah2hj66rfqfezw.jpeg?q=90 | Cubonic DLA2 Cooling Fan | 70% OFF | MRP 2499 | Price 746 | https://fktr.in/wjefuY7",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/motion-controller/t/e/3/v3-180-degree-racing-game-steering-wheel-with-brake-pedal-pxn-original-imah53f2jazfeguc.jpeg?q=90 | PXN V3 Racing Steering Wheel | 39% OFF | MRP 9999 | Price 6095 | https://fktr.in/q9eS1mi",
+      "https://rukminim1.flixcart.com/image/640/640/xif0q/webcam/6/y/k/net-bo-300-fhd-lenovo-original-imaghg69xuwxkyzx.jpeg?q=90 | Lenovo 300 FHD Webcam | 23% OFF | MRP 4099 | Price 3174 | https://fktr.in/B4162aE"
+    ];
+
+    const kkContainer = document.getElementById('kk-product-container');
+    productList.forEach(item => {
+      let [img, title, disc, mrp, price, link] = item.split('|').map(s => s.trim());
+      kkContainer.innerHTML += `
+        <div class="kk-card search-item" onclick="window.open('${link}', '_blank')">
+          <div class="kk-heart">♡</div>
+          <div class="kk-img-box"><img src="${img}" alt="Product"></div>
+          <div class="kk-sponsored">Sponsored</div>
+          <div class="kk-title item-title">${title}</div>
+          <div class="kk-price-row">
+            <span class="kk-discount">${disc}</span>
+            <span class="kk-mrp">${mrp}</span>
+            <span class="kk-price">${price}</span>
+          </div>
+          <div class="kk-offer"><span class="kk-wow">WOW!</span> Top Deal</div>
+          <div class="kk-rating-row">
+            <span class="kk-stars">★★★★★</span>
+            <img class="kk-assured" src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/fa_62673a.png" alt="Assured">
+          </div>
+          <button class="kk-buy-btn">BUY NOW</button>
+        </div>`;
+    });
+
+    // Navbar Scroll Logic
+    let lastScrollTop = 0;
+    const navbar = document.getElementById('main-navbar');
+    window.addEventListener('scroll', function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      navbar.style.top = (scrollTop > lastScrollTop) ? "-180px" : "0";
+      lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    });
+
+    // Theme Logic & Search
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('change', () => document.body.classList.toggle('amazora-theme'));
+    
+    document.getElementById('search-input').addEventListener('keyup', function() {
+      let query = this.value.toLowerCase();
+      document.querySelectorAll('.search-item').forEach(item => {
+        item.style.display = item.querySelector('.item-title').innerText.toLowerCase().includes(query) ? "flex" : "none";
+      });
+    });
+  </script>
+</body>
+</html>
