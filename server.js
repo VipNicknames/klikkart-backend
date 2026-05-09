@@ -8,21 +8,38 @@ app.use(cors());
 app.use(express.static(__dirname));
 
 app.get("/products", async (req, res) => {
-  try {
 
-    const response = await fetch("https://fakestoreapi.com/products");
+try {
 
-    const data = await response.json();
+const response = await fetch("https://fakestoreapi.com/products");
 
-    res.json(data);
+const data = await response.json();
 
-  } catch (error) {
+console.log(data);
 
-    res.status(500).json({
-      error: "Products load nahi hue"
-    });
+res.json(data);
 
-  }
+} catch (error) {
+
+console.log(error);
+
+res.json([
+{
+title:"Gaming Mouse",
+price:999,
+description:"RGB Gaming Mouse",
+image:"https://images.unsplash.com/photo-1527814050087-3793815479db"
+},
+{
+title:"Gaming Keyboard",
+price:1999,
+description:"Mechanical Keyboard",
+image:"https://images.unsplash.com/photo-1511467687858-23d96c32e4ae"
+}
+]);
+
+}
+
 });
 
 app.get("/", (req, res) => {
